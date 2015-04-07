@@ -1,8 +1,10 @@
 Flask==0.10.1
+Flask-RESTful==0.3.2
 Flask-SocketIO==0.6.0
 Jinja2==2.7.3
 MarkupSafe==0.23
 Werkzeug==0.10.4
+aniso8601==0.92
 argparse==1.2.1
 backports.ssl-match-hostname==3.4.0.2
 gevent==1.0.1
@@ -11,8 +13,10 @@ gevent-websocket==0.9.3
 greenlet==0.4.5
 gunicorn==0.16.1
 itsdangerous==0.24
+pytz==2015.2
 requests==2.6.0
 six==1.9.0
 socketIO-client==0.6.1
+urllib3==1.10.2
 websocket-client==0.29.0
 wsgiref==0.1.2
