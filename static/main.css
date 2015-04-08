@@ -1,0 +1,36 @@
+#sequencer {
+	width: 600px;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.note {
+	width: 71px;
+	display: inline-block;
+	height: 71px;
+	background-color: #ccc;
+	border: 1px solid black;
+	margin: 1px;
+}
+
+.kick div {
+	background-color: #ff1493;
+}
+
+.snare div {
+	background-color: #ffcd20;
+}
+
+.open_hat div{
+	/*background-color: #4c33ff;*/
+	background-color: #735aff;
+}
+
+.closed_hat div{
+	/*background-color: #4c33ff;*/
+	background-color: #aeff14;
+}
+
+.kick div:hover{
+	background-color: #aa1493;
+}

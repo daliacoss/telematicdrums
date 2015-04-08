@@ -2,6 +2,8 @@
 <html>
 <title>My jQuery JSON Web Page</title>
 <head>
+	<link rel="stylesheet" href="/static/main.css" type="text/css" />
+	<meta name="viewport" content="width=700">
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
 <script type="text/javascript">
 
@@ -29,11 +31,15 @@ JSONTest = function() {
 </head>
 <body>
 
-<h1>My jQuery JSON Web Page</h1>
+	<div id="sequencer">
+		<div class="kick">{% for i in range(8) %}<div class="note"></div>{% endfor %}</div>
+		<div class="snare">{% for i in range(8) %}<div class="note"></div>{% endfor %}</div>
+		<div class="closed_hat">{% for i in range(8) %}<div class="note"></div>{% endfor %}</div>
+		<div class="open_hat">{% for i in range(8) %}<div class="note"></div>{% endfor %}</div>
+	</div>
+	<div id="resultDivContainer"></div>
 
-<div id="resultDivContainer"></div>
-
-<button type="button" onclick="JSONTest()">JSON</button>
+	<button type="button" onclick="JSONTest()">JSON</button>
 
 </body>
 </html> 
