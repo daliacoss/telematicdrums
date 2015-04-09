@@ -13,26 +13,31 @@
 	margin: 1px;
 }
 
-.kick div {
+.kick .note {
 	background-color: #ff1493;
 }
-.kick div .selected{
+.kick .note.selected{
 	background-color: #aa1493;
 }
 
-.snare div {
+.snare .note {
 	background-color: #ffcd20;
 }
-.snare div .selected{
+.snare .note.selected{
 	background-color: #a78500;
 }
 
-.open_hat div{
+.open_hat .note{
 	/*background-color: #4c33ff;*/
 	background-color: #735aff;
 }
+.open_hat .note.selected{
+	background-color: #012ebb;
+}
 
-.closed_hat div{
-	/*background-color: #4c33ff;*/
+.closed_hat .note{
 	background-color: #aeff14;
+}
+.closed_hat .note.selected{
+	background-color: #0da600;
 }

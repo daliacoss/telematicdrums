@@ -8,7 +8,8 @@
 	<script type="text/javascript">
 
 		var session_key = "{{session_key}}";
-		console.log(session_key)
+		var sequenceDom = [0,0,0,0];
+		console.log(session_key);
 
 		JSONTest = function() {
 
@@ -31,16 +32,63 @@
 		    });
 		};
 
+		function sequenceDomToSequence(sdom){
+
+			var sequence = [[],[],[],[]]
+			$.each(sdom, function(i, channel){
+				$.each(channel, function(j, noteDom){
+					sequence[i][j] = ($(noteDom).hasClass("selected") ? 1 : 0);
+				});
+			});
+
+			return sequence;
+		}
+
+		function sendSequenceData(){
+			$.ajax({
+				url: "/trigger/"+session_key,
+				type: "POST",
+				data: {sequence: sequenceDomToSequence(sequenceDom)},
+				dataType: "json",
+				success: function (result) {
+				    console.log(result["msg"]);
+				},
+				error: function (xhr, ajaxOptions, thrownError) {
+				// alert(xhr.status);
+				// alert(thrownError);
+				}
+		    });
+		}
+
+		$(document).ready(function(){
+
+			var notes = $(".note");
+			$.each([".kick", ".snare", ".closed_hat", ".open_hat"], function(i, channel){
+				sequenceDom[i] = $(channel).children();
+			});
+			console.log(sequenceDomToSequence(sequenceDom));
+
+			notes.mousedown(function(){
+				if ($(this).hasClass("selected")){
+					$(this).removeClass("selected");
+				}
+				else {
+					$(this).addClass("selected");					
+				}
+
+				sendSequenceData();
+			})
+		})
+
 	</script>
 </head>
 <body>
 
 	<div id="sequencer">
-		<div class="kick">{% for i in range(8) %}<div class="note"></div>{% endfor %}</div>
-		<div class="snare">{% for i in range(8) %}<div class="note"></div>{% endfor %}</div>
-		<div class="closed_hat">{% for i in range(8) %}<div class="note"></div>{% endfor %}</div>
-		<div class="open_hat">{% for i in range(8) %}<div class="note"></div>{% endfor %}</div>
-	</div>
+		{% for channel in ["kick", "snare", "closed_hat", "open_hat"] %}
+		<div class="{{channel}}">
+			{% for note in sequence[loop.index0] %}<div class="note{% if note %} selected{% endif %}"></div>{% endfor %}</div>
+		{% endfor %}
 	<div id="resultDivContainer"></div>
 
 	<button type="button" onclick="JSONTest()">JSON</button>
