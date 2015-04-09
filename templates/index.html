@@ -15,10 +15,11 @@
 		    var resultDiv = $("#resultDivContainer");
 
 		    $.ajax({
-		        url: "/trigger/45ef037",
+		        url: "/trigger/"+session_key,
 		        type: "POST",
-		        data: { apiKey: "23462", method: "example", ip: "208.74.35.5", sequence: [
-		        [1,2,3,4,5,6,7,8],[1,2,3,4,5,6,7,8],[1,2,3,4,5,6,7,8],[1,2,3,4,5,6,7,8]]},
+		        data: {sequence: [
+		        	[1,0,1,0,1,0,1,0],[0,0,1,0,0,0,1,0],[0,1,0,1,0,1,0,0,],[0,0,0,0,0,0,1,1,]
+		        ]},
 		        dataType: "json",
 		        success: function (result) {
 		            resultDiv.html(result["msg"]);

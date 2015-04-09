@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, redirect, abort
 from flask_restful import Api, Resource, reqparse
 from flask.ext.socketio import SocketIO
 from flask.ext.sqlalchemy import SQLAlchemy
-import time, os, random, string
+import time, datetime, os, random, string
 
 app = Flask(__name__)
 api = Api(app)
@@ -25,6 +25,7 @@ socketIO = SocketIO(app)
 
 LEN_SEQUENCE = 8
 NUM_CHANNELS = 4
+MAX_LISTEN_TIMEDELTA = 10
 
 class Session(db.Model):
 	__tablename__ = "sessions"
@@ -32,10 +33,13 @@ class Session(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
 	key = db.Column(db.String(7), index=True)
 	listening = db.Column(db.Boolean)
+	edited = db.Column(db.Boolean)
+	last_listen = db.Column(db.DateTime)
 
 	def __init__(self, key):
 		self.key = key
 		self.listening = False
+		self.edited = False
 
 class SequenceNote(db.Model):
 	__tablename__ = "sequence_notes"
@@ -56,21 +60,36 @@ class HelloWorld(Resource):
 
 	def get(self, session_key):
 
-		session = db.session.query(Session).filter(Session.key==session_key).all()
+		session = db.session.query(Session).filter(Session.key==session_key).one()
 		if not session:
 			return {"message": "failed: session does not exist"}, 404
-		# global edited
-		# i = 0
+		elif (
+			session.listening and
+			session.last_listen and
+			(datetime.datetime.utcnow() - session.last_listen).seconds < MAX_LISTEN_TIMEDELTA
+		):
+			return {"message": "failed: exceeded max number of listeners"}, 408
 
-		# while not edited:
-		# 	# keep connection alive for 10 seconds
-		# 	if i > 200:
-		# 		return {"message": "timeout"}
-		# 	time.sleep(.05)
-		# 	i += 1
+		session.listening = True
+		session.last_listen = datetime.datetime.utcnow()
+		db.session.commit()
 
-		# edited = False
-		return {"message": "success"}#, "data": sequencerData, "session_key": session_key}
+		i = 0
+
+		while not session.edited:
+			# keep connection alive for 10 seconds
+			if i > 200:
+				return {"message": "timeout"}
+			time.sleep(.05)
+			i += 1
+			db.session.refresh(session)
+
+		session.edited = False
+		session.listening = False
+
+		seq = getSequence(session.id)
+		db.session.commit()
+		return {"message": "success", "data": seq, "session_key": session_key}
 
 	def post(self, session_key):
 
@@ -80,32 +99,33 @@ class HelloWorld(Resource):
 		# parser.add_argument('sequence', type=list)
 		# args = parser.parse_args()
 
-		sequence = [list(channel) for channel in sequencerData["sequence"]]
-
-		session = db.session.query(Session).filter(Session.key==session_key).all()
+		session = db.session.query(Session).filter(Session.key==session_key).one()
 		if not session:
 			return {"message": "failed: session does not exist"}, 404
+		sequence = getSequence(session.id)
 
+		#for each channel
+		for i in range(NUM_CHANNELS):
+			channel = request.form.getlist("sequence[%d][]" % i)
+			if not channel:
+				return {"msg":"failed: not enough channels in sequence"}, 400
+			elif len(channel) != LEN_SEQUENCE:
+				return {"msg":"failed: wrong number of notes in channel"}, 400
+
+			#for each note
+			for j, note in enumerate(channel):
+				try:
+					sequence[i][j] = int(note)
+				except TypeError, ValueError:
+					return {"msg":"failed: invalid note value"}, 400
+
+		# sequencerData["sequence"] = sequence
+
+		print sequence
+
+		modifySequence(session.id, sequence)
+		session.edited = True
 		db.session.commit()
-
-		# for i, origChannel in enumerate(sequencerData["sequence"]):
-		# 	channel = request.form.getlist("sequence[%d][]" % i)
-		# 	print channel
-		# 	if not channel:
-		# 		return {"msg":"failed: not enough channels in sequence"}, 400
-		# 	elif len(channel) != len(origChannel):
-		# 		return {"msg":"failed: wrong number of notes in channel"}, 400
-
-		# 	for j, note in enumerate(channel):
-		# 		try:
-		# 			sequence[i][j] = int(note)
-		# 		except TypeError, ValueError:
-		# 			return {"msg":"failed: invalid note value"}, 400
-
-		# sequencerData["sequence"] = sequence 
-
-		global edited
-		edited = True
 
 		# return {"msg": "success", "data":sequence}
 		return {"msg": "success"}
@@ -135,6 +155,16 @@ def getSequence(session_id):
 	]
 	return sequence
 
+def modifySequence(session_id, newSequence):
+
+	q = db.session.query(SequenceNote).filter(SequenceNote.session_id==session_id)
+	for i, channel in enumerate(newSequence):
+		qc = q.filter(SequenceNote.channel_id==i)
+		for j, noteVal in enumerate(channel):
+			note = qc.filter(SequenceNote.position==j).one()
+			note.value = noteVal
+			db.session.commit()
+
 @app.route("/")
 def index():
 	key = ''.join(random.SystemRandom().choice(string.lowercase+string.digits+string.uppercase) for _ in xrange(7))
@@ -159,13 +189,12 @@ def player(session_key):
 
 	#even if we've created a sequence, we want it in a nested format
 	sequence = getSequence(session.id)
-	print sequence
 	# print [(x.value, x.position) for x in sequence[0]]
 	# print [(x.value, x.position) for x in sequence[1]]
 	# print [(x.value, x.position) for x in sequence[2]]
 	# print [(x.value, x.position) for x in sequence[3]]
 
-	return render_template('index.html', session_key=session_key)
+	return render_template('index.html', session_key=session_key, sequence=sequence)
 
 # @socketIO.on('my event')
 # def handle_source(json_data):
