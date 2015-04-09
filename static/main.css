@@ -16,9 +16,15 @@
 .kick div {
 	background-color: #ff1493;
 }
+.kick div .selected{
+	background-color: #aa1493;
+}
 
 .snare div {
 	background-color: #ffcd20;
+}
+.snare div .selected{
+	background-color: #a78500;
 }
 
 .open_hat div{
@@ -29,8 +35,4 @@
 .closed_hat div{
 	/*background-color: #4c33ff;*/
 	background-color: #aeff14;
-}
-
-.kick div:hover{
-	background-color: #aa1493;
 }

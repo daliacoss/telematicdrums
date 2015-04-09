@@ -4,30 +4,33 @@
 <head>
 	<link rel="stylesheet" href="/static/main.css" type="text/css" />
 	<meta name="viewport" content="width=700">
-<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
-<script type="text/javascript">
+	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+	<script type="text/javascript">
 
-JSONTest = function() {
+		var session_key = "{{session_key}}";
+		console.log(session_key)
 
-    var resultDiv = $("#resultDivContainer");
+		JSONTest = function() {
 
-    $.ajax({
-        url: "/trigger",
-        type: "POST",
-        data: { apiKey: "23462", method: "example", ip: "208.74.35.5", sequence: [
-        [1,2,3,4,5,6,7,8],[1,2,3,4,5,6,7,8],[1,2,3,4,5,6,7,8],[1,2,3,4,5,6,7,8]]},
-        dataType: "json",
-        success: function (result) {
-            resultDiv.html(result["msg"]);
-        },
-        error: function (xhr, ajaxOptions, thrownError) {
-        // alert(xhr.status);
-        // alert(thrownError);
-        }
-    });
-};
+		    var resultDiv = $("#resultDivContainer");
 
-</script>
+		    $.ajax({
+		        url: "/trigger/45ef037",
+		        type: "POST",
+		        data: { apiKey: "23462", method: "example", ip: "208.74.35.5", sequence: [
+		        [1,2,3,4,5,6,7,8],[1,2,3,4,5,6,7,8],[1,2,3,4,5,6,7,8],[1,2,3,4,5,6,7,8]]},
+		        dataType: "json",
+		        success: function (result) {
+		            resultDiv.html(result["msg"]);
+		        },
+		        error: function (xhr, ajaxOptions, thrownError) {
+		        // alert(xhr.status);
+		        // alert(thrownError);
+		        }
+		    });
+		};
+
+	</script>
 </head>
 <body>
 
