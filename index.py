@@ -194,7 +194,7 @@ def player(session_key):
 	# print [(x.value, x.position) for x in sequence[2]]
 	# print [(x.value, x.position) for x in sequence[3]]
 
-	return render_template('index.html', session_key=session_key, sequence=sequence)
+	return render_template('index.html', session_key=session_key, sequence=sequence, tempo=100)
 
 # @socketIO.on('my event')
 # def handle_source(json_data):

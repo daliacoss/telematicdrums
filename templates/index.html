@@ -9,28 +9,8 @@
 
 		var session_key = "{{session_key}}";
 		var sequenceDom = [0,0,0,0];
+		var tempo = {{tempo}};
 		console.log(session_key);
-
-		JSONTest = function() {
-
-		    var resultDiv = $("#resultDivContainer");
-
-		    $.ajax({
-		        url: "/trigger/"+session_key,
-		        type: "POST",
-		        data: {sequence: [
-		        	[1,0,1,0,1,0,1,0],[0,0,1,0,0,0,1,0],[0,1,0,1,0,1,0,0,],[0,0,0,0,0,0,1,1,]
-		        ]},
-		        dataType: "json",
-		        success: function (result) {
-		            resultDiv.html(result["msg"]);
-		        },
-		        error: function (xhr, ajaxOptions, thrownError) {
-		        // alert(xhr.status);
-		        // alert(thrownError);
-		        }
-		    });
-		};
 
 		function sequenceDomToSequence(sdom){
 
@@ -89,9 +69,6 @@
 		<div class="{{channel}}">
 			{% for note in sequence[loop.index0] %}<div class="note{% if note %} selected{% endif %}"></div>{% endfor %}</div>
 		{% endfor %}
-	<div id="resultDivContainer"></div>
-
-	<button type="button" onclick="JSONTest()">JSON</button>
 
 </body>
 </html> 
