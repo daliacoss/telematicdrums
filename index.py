@@ -63,13 +63,16 @@ class HelloWorld(Resource):
 		print "hello"
 
 		session = db.session.query(Session).filter(Session.key==session_key).one()
+		print session
 		if not session:
+			print "session does not exist"
 			return {"message": "failed: session does not exist"}, 404
 		elif (
 			session.listening and
 			session.last_listen and
 			(datetime.datetime.utcnow() - session.last_listen).seconds < MAX_LISTEN_TIMEDELTA
 		):
+			print "session exists but already has listeners"
 			return {"message": "failed: exceeded max number of listeners"}, 408
 
 		print "still listening"
