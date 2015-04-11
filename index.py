@@ -60,6 +60,8 @@ class HelloWorld(Resource):
 
 	def get(self, session_key):
 
+		print "hello"
+
 		session = db.session.query(Session).filter(Session.key==session_key).one()
 		if not session:
 			return {"message": "failed: session does not exist"}, 404
