@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, redirect, abort
 from flask_restful import Api, Resource, reqparse
 from flask.ext.socketio import SocketIO
 from flask.ext.sqlalchemy import SQLAlchemy
-import time, datetime, os, random, string, sys
+import time, datetime, os, random, string
 
 app = Flask(__name__)
 api = Api(app)
@@ -63,21 +63,15 @@ class HelloWorld(Resource):
 		print "hello"
 
 		session = db.session.query(Session).filter(Session.key==session_key).one()
-		print session
-		try:
-			if not session:
-				print "session does not exist"
-				return {"message": "failed: session does not exist"}, 404
-			elif (
-				session.listening and
-				session.last_listen and
-				(datetime.datetime.utcnow() - session.last_listen).seconds < MAX_LISTEN_TIMEDELTA
-			):
-				print "session exists but already has listeners"
-				return {"message": "failed: exceeded max number of listeners"}, 408
-		except:
-			print sys.exc_info()
-			sys.exit()
+
+		if not session:
+			return {"message": "failed: session does not exist"}, 404
+		# elif (
+		# 	session.listening and
+		# 	session.last_listen and
+		# 	(datetime.datetime.utcnow() - session.last_listen).seconds < MAX_LISTEN_TIMEDELTA
+		# ):
+		# 	return {"message": "failed: exceeded max number of listeners"}, 408
 
 		session.listening = True
 		session.last_listen = datetime.datetime.utcnow()
