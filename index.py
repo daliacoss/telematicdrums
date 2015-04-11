@@ -72,6 +72,8 @@ class HelloWorld(Resource):
 		):
 			return {"message": "failed: exceeded max number of listeners"}, 408
 
+		print "still listening"
+
 		session.listening = True
 		session.last_listen = datetime.datetime.utcnow()
 		db.session.commit()
