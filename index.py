@@ -56,6 +56,17 @@ class SequenceNote(db.Model):
 		self.value = value
 		self.position = position
 
+class Sequence(db.Model):
+	__tablename__ = "sequences"
+
+	id = db.Column(db.Integer, primary_key=True)
+	session_id = db.Column(db.Integer, db.ForeignKey("sessions.id"))
+	tempo = db.Column(db.Integer)
+
+	def __init__(self, tempo, session_id):
+		self.session_id = session_id
+		self.tempo = tempo
+
 class HelloWorld(Resource):
 
 	def get(self, session_key):
@@ -63,6 +74,7 @@ class HelloWorld(Resource):
 		print "hello"
 
 		session = db.session.query(Session).filter(Session.key==session_key).one()
+		sequence = db.session.query(Sequence).filter(Sequence.session_id==session.id).one()
 
 		if not session:
 			return {"message": "failed: session does not exist"}, 404
@@ -92,7 +104,7 @@ class HelloWorld(Resource):
 
 		seq = getSequence(session.id)
 		db.session.commit()
-		return {"message": "success", "data": seq, "session_key": session_key}
+		return {"message": "success", "data": {"sequence":seq,"tempo":sequence.tempo}, "session_key": session_key}
 
 	def post(self, session_key):
 
@@ -106,6 +118,7 @@ class HelloWorld(Resource):
 		if not session:
 			return {"message": "failed: session does not exist"}, 404
 		sequence = getSequence(session.id)
+		sequenceObject = db.session.query(Sequence).filter(Sequence.session_id==session.id).one()
 
 		#for each channel
 		for i in range(NUM_CHANNELS):
@@ -128,6 +141,8 @@ class HelloWorld(Resource):
 
 		modifySequence(session.id, sequence)
 		session.edited = True
+		tempo = int(request.form.get("tempo"))
+		sequenceObject.tempo = tempo
 		db.session.commit()
 
 		# return {"msg": "success", "data":sequence}
@@ -192,12 +207,14 @@ def player(session_key):
 
 	#even if we've created a sequence, we want it in a nested format
 	sequence = getSequence(session.id)
-	# print [(x.value, x.position) for x in sequence[0]]
-	# print [(x.value, x.position) for x in sequence[1]]
-	# print [(x.value, x.position) for x in sequence[2]]
-	# print [(x.value, x.position) for x in sequence[3]]
 
-	return render_template('index.html', session_key=session_key, sequence=sequence, tempo=100)
+	sequenceObject = db.session.query(Sequence).filter(Sequence.session_id==session.id).first()
+	if not sequenceObject:
+		sequenceObject = Sequence(100, session.id)
+		db.session.add(sequenceObject)
+		db.session.commit()
+
+	return render_template('index.html', session_key=session_key, sequence=sequence, tempo=sequenceObject.tempo)
 
 # @socketIO.on('my event')
 # def handle_source(json_data):

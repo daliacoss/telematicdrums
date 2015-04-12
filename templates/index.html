@@ -28,7 +28,7 @@
 			$.ajax({
 				url: "/trigger/"+session_key,
 				type: "POST",
-				data: {sequence: sequenceDomToSequence(sequenceDom)},
+				data: {sequence: sequenceDomToSequence(sequenceDom), tempo: tempo},
 				dataType: "json",
 				success: function (result) {
 				    console.log(result["msg"]);
@@ -58,6 +58,19 @@
 
 				sendSequenceData();
 			})
+
+			$("#slower").click(function(){
+				if (tempo >= 10){
+					tempo -= 10;
+				}
+				$("#tempo").text(tempo);
+				sendSequenceData();
+			})
+			$("#faster").click(function(){
+				tempo += 10;
+				$("#tempo").text(tempo);
+				sendSequenceData();
+			})
 		})
 
 	</script>
@@ -67,8 +80,12 @@
 	<div id="sequencer">
 		{% for channel in ["kick", "snare", "closed_hat", "open_hat"] %}
 		<div class="{{channel}}">
-			{% for note in sequence[loop.index0] %}<div class="note{% if note %} selected{% endif %}"></div>{% endfor %}</div>
+			{% for note in sequence[loop.index0] %}<div class="note{% if note %} selected{% endif %}"></div>{% endfor %}
+		</div>
 		{% endfor %}
-
+		<div id="footer">
+			<p><input type="button" value="Slower" id="slower"/> <span id="tempo">{{tempo}}</span> <input type="button" value="Faster" id="faster"/></p>
+		</div>
+	</div>
 </body>
 </html> 

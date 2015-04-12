@@ -18,11 +18,12 @@ def saveApiResult(url):
 		sys.exit(1)
 
 	elif response.json().get("message") == "success":
+
 		data = response.json().get("data")
 
-		print data
+		print response.json()
 
 		with open("seq.p", "w") as sf:
-			pickle.dump({"sequencerData":{"sequence":data,"tempo":100}}, sf)
+			pickle.dump({"sequencerData":{"sequence":data["sequence"],"tempo":data["tempo"]}}, sf)
 
 listenForever(sys.argv[1])

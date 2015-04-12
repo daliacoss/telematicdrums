@@ -4,6 +4,14 @@
 	margin-right: auto;
 }
 
+#tempo {
+	font-size: 1.6em;
+}
+
+#footer {
+	text-align: center;
+}
+
 .note {
 	width: 71px;
 	display: inline-block;
