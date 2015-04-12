@@ -8,6 +8,6 @@ def playLoop():
 			data = pickle.load(seqFile)
 		sequence = data["sequencerData"]["sequence"]
 		tempo = data["sequencerData"]["tempo"]
-		#	time.sleep()
+			# time.sleep()
 
 playLoop()

@@ -66,12 +66,12 @@ class HelloWorld(Resource):
 
 		if not session:
 			return {"message": "failed: session does not exist"}, 404
-		# elif (
-		# 	session.listening and
-		# 	session.last_listen and
-		# 	(datetime.datetime.utcnow() - session.last_listen).seconds < MAX_LISTEN_TIMEDELTA
-		# ):
-		# 	return {"message": "failed: exceeded max number of listeners"}, 408
+		elif (
+			session.listening and
+			session.last_listen and
+			(datetime.datetime.utcnow() - session.last_listen).seconds < MAX_LISTEN_TIMEDELTA
+		):
+			return {"message": "failed: exceeded max number of listeners"}, 408
 
 		session.listening = True
 		session.last_listen = datetime.datetime.utcnow()
