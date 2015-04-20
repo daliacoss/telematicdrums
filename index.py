@@ -32,14 +32,14 @@ class Session(db.Model):
 
 	id = db.Column(db.Integer, primary_key=True)
 	key = db.Column(db.String(7), index=True)
-	listening = db.Column(db.Boolean)
-	edited = db.Column(db.Boolean)
+	listening = db.Column(db.Integer)
+	edited = db.Column(db.Integer)
 	last_listen = db.Column(db.DateTime)
 
 	def __init__(self, key):
 		self.key = key
-		self.listening = False
-		self.edited = False
+		self.listening = 0
+		self.edited = 0
 
 class SequenceNote(db.Model):
 	__tablename__ = "sequence_notes"
@@ -71,8 +71,6 @@ class HelloWorld(Resource):
 
 	def get(self, session_key):
 
-		print "hello"
-
 		session = db.session.query(Session).filter(Session.key==session_key).one()
 		sequence = db.session.query(Sequence).filter(Sequence.session_id==session.id).one()
 
@@ -85,7 +83,7 @@ class HelloWorld(Resource):
 		):
 			return {"message": "failed: exceeded max number of listeners"}, 408
 
-		session.listening = True
+		session.listening = 1
 		session.last_listen = datetime.datetime.utcnow()
 		db.session.commit()
 
@@ -99,8 +97,8 @@ class HelloWorld(Resource):
 			i += 1
 			db.session.refresh(session)
 
-		session.edited = False
-		session.listening = False
+		session.edited = 0
+		session.listening = 0
 
 		seq = getSequence(session.id)
 		db.session.commit()
@@ -140,7 +138,7 @@ class HelloWorld(Resource):
 		print sequence
 
 		modifySequence(session.id, sequence)
-		session.edited = True
+		session.edited = 1
 		tempo = int(request.form.get("tempo"))
 		sequenceObject.tempo = tempo
 		db.session.commit()
