@@ -1,7 +1,7 @@
 from __future__ import print_function
 from flask import Flask, render_template, request, redirect, abort
 from flask_restful import Api, Resource, reqparse
-from flask.ext.socketio import SocketIO
+# from flask.ext.socketio import SocketIO
 from flask.ext.sqlalchemy import SQLAlchemy
 import time, datetime, os, random, string
 
@@ -10,19 +10,7 @@ api = Api(app)
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("DATABASE_URL")
 
 db = SQLAlchemy(app)
-socketIO = SocketIO(app)
-
-# sequencerData = {
-# 	"sequence":[
-# 		[1,0,1,0,1,1,1,0],
-# 		[0,0,1,0,0,0,1,0],
-# 		[1,1,1,1,1,1,1,1],
-# 		[0,0,1,0,1,1,0,0],
-# 	],
-# 	"tempo":100,
-# }
-
-# edited = False
+# socketIO = SocketIO(app)
 
 LEN_SEQUENCE = 8
 NUM_CHANNELS = 4
