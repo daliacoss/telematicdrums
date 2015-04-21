@@ -1,5 +1,5 @@
 from __future__ import print_function
-from flask import Flask, render_template, request, redirect, abort
+from flask import Flask, render_template, request, redirect, abort, url_for
 from flask_restful import Api, Resource, reqparse
 # from flask.ext.socketio import SocketIO
 from flask.ext.sqlalchemy import SQLAlchemy
@@ -175,6 +175,7 @@ def index():
 
 @app.route("/<string:session_key>")
 def player(session_key):
+
 	if type(session_key) not in (str, unicode) or len(session_key) != 7:
 		return abort(400, "Session key must be 7-character string")
 

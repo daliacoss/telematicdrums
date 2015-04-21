@@ -1,3 +1,7 @@
+body {
+	font-family: Helvetica;
+}
+
 #sequencer {
 	width: 600px;
 	margin-left: auto;
@@ -10,6 +14,10 @@
 
 #footer {
 	text-align: center;
+}
+
+#listen_url {
+	font-weight: bold;
 }
 
 .note {

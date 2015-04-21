@@ -1,3 +1,4 @@
+from __future__ import print_function
 import rtmidi, pickle, sys, time
 
 noteOn = (lambda channel, pitch, velocity=127: (143+channel, pitch, velocity))
@@ -6,7 +7,8 @@ NOTE_VALUES = [60, 48, 60, 60]
 def playLoop():
 
 	device = rtmidi.MidiOut()
-	device.open_virtual_port("PyCon Drum Machine")
+	device.open_virtual_port("Telematic Drum Machine")
+	print("opened port \"Telematic Drum Machine\"")
 
 	try:
 		while True:
@@ -25,6 +27,10 @@ def playLoop():
 					device.send_message(noteOn(j+1, NOTE_VALUES[j]*channel[i]))
 				time.sleep(eighth)
 	except KeyboardInterrupt:
+		#flush all MIDI channels by sending noteOffs
+		for i, channel in enumerate(sequence):
+			device.send_message(noteOn(i+1, NOTE_VALUES[i], 0))
 		device.close_port()
 
-playLoop()
+if __name__ == "__main__":
+	playLoop()

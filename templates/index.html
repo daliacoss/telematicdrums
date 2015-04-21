@@ -10,7 +10,9 @@
 		var session_key = "{{session_key}}";
 		var sequenceDom = [0,0,0,0];
 		var tempo = {{tempo}};
-		console.log(session_key);
+		var loc = document.location;
+		console.log(loc.protocol + "//" + loc.host + "/listen/" + session_key);
+		// console.log(loc);
 
 		function sequenceDomToSequence(sdom){
 
@@ -31,7 +33,7 @@
 				data: {sequence: sequenceDomToSequence(sequenceDom), tempo: tempo},
 				dataType: "json",
 				success: function (result) {
-				    console.log(result["msg"]);
+				    // console.log(result["msg"]);
 				},
 				error: function (xhr, ajaxOptions, thrownError) {
 				// alert(xhr.status);
@@ -42,11 +44,12 @@
 
 		$(document).ready(function(){
 
+			$("#listen_url").text(loc.protocol + "//" + loc.host + "/listen/" + session_key);
 			var notes = $(".note");
 			$.each([".kick", ".snare", ".closed_hat", ".open_hat"], function(i, channel){
 				sequenceDom[i] = $(channel).children();
 			});
-			console.log(sequenceDomToSequence(sequenceDom));
+			// console.log(sequenceDomToSequence(sequenceDom));
 
 			notes.mousedown(function(){
 				if ($(this).hasClass("selected")){
@@ -85,6 +88,7 @@
 		{% endfor %}
 		<div id="footer">
 			<p><input type="button" value="Slower" id="slower"/> <span id="tempo">{{tempo}}</span> <input type="button" value="Faster" id="faster"/></p>
+			<p>listen on:<br/><span id="listen_url"></span></p>
 		</div>
 	</div>
 </body>
