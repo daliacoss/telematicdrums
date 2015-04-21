@@ -1,3 +1,4 @@
+from __future__ import print_function
 from flask import Flask, render_template, request, redirect, abort
 from flask_restful import Api, Resource, reqparse
 from flask.ext.socketio import SocketIO
@@ -67,7 +68,7 @@ class Sequence(db.Model):
 		self.session_id = session_id
 		self.tempo = tempo
 
-class HelloWorld(Resource):
+class SequenceEventListener(Resource):
 
 	def get(self, session_key):
 
@@ -76,14 +77,14 @@ class HelloWorld(Resource):
 
 		if not session:
 			return {"message": "failed: session does not exist"}, 404
-		elif (
-			session.listening and
-			session.last_listen and
-			(datetime.datetime.utcnow() - session.last_listen).seconds < MAX_LISTEN_TIMEDELTA
-		):
-			return {"message": "failed: exceeded max number of listeners"}, 408
+		# elif (
+		# 	session.listening and
+		# 	session.last_listen and
+		# 	(datetime.datetime.utcnow() - session.last_listen).seconds < MAX_LISTEN_TIMEDELTA
+		# ):
+		# 	return {"message": "failed: exceeded max number of listeners"}, 408
 
-		session.listening = 1
+		session.listening += 1
 		session.last_listen = datetime.datetime.utcnow()
 		db.session.commit()
 
@@ -91,26 +92,26 @@ class HelloWorld(Resource):
 
 		while not session.edited:
 			# keep connection alive for 10 seconds
-			if i > 200:
+			if i >= 200:
+				#this line should be reached even if disconnect occurs
+				session.listening -= 1
+				db.session.commit()
 				return {"message": "timeout"}
 			time.sleep(.05)
 			i += 1
 			db.session.refresh(session)
 
-		session.edited = 0
-		session.listening = 0
+		#subtracting 1 from edited instead of setting edited to 0 prevents us from interfering with other listeners
+		session.edited -= 1
+		session.listening -= 1
 
 		seq = getSequence(session.id)
 		db.session.commit()
 		return {"message": "success", "data": {"sequence":seq,"tempo":sequence.tempo}, "session_key": session_key}
 
-	def post(self, session_key):
+class SequenceEventTrigger(Resource):
 
-		# sequencerData["sequence"][0][0] += 1
-		# sequencerData["tempo"] = 120
-		# parser = reqparse.RequestParser()
-		# parser.add_argument('sequence', type=list)
-		# args = parser.parse_args()
+	def post(self, session_key):
 
 		session = db.session.query(Session).filter(Session.key==session_key).one()
 		if not session:
@@ -133,20 +134,18 @@ class HelloWorld(Resource):
 				except TypeError, ValueError:
 					return {"msg":"failed: invalid note value"}, 400
 
-		# sequencerData["sequence"] = sequence
-
-		print sequence
-
 		modifySequence(session.id, sequence)
-		session.edited = 1
+
+		#if there are no current listeners, then the first listener to arrive gets to see the edit
+		session.edited = session.listening or 1
 		tempo = int(request.form.get("tempo"))
 		sequenceObject.tempo = tempo
 		db.session.commit()
 
-		# return {"msg": "success", "data":sequence}
 		return {"msg": "success"}
 
-api.add_resource(HelloWorld, '/trigger/<string:session_key>', methods=["GET", "POST"])
+api.add_resource(SequenceEventTrigger, '/trigger/<string:session_key>', methods=["POST"])
+api.add_resource(SequenceEventListener, '/listen/<string:session_key>', methods=["GET"])
 
 def createSequence(session_id):
 	"""create a collection of SequenceNotes to be added to the database"""
