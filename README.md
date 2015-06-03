@@ -13,7 +13,6 @@ Requirements
 
 **Server Side**
 * all dependencies listed in requirements.txt
-* OPTIONAL: foreman
 
 **Client Side**
 * all dependencies listed in requirements-client.txt
@@ -26,7 +25,7 @@ Skip this section if you would prefer to use the existing server side instance o
 
 Install dependencies: `pip install -r requirements.txt`
 
-Run the app: The entrypoint for the web app is index.py. My personal setup is to run the app using Foreman with the command `foreman start`. Foreman will automatically configure itself using the included Procfile, as long as the command is run from the top directory of the project.
+Run the app: `gunicorn index.py` 
 
 **Client Side**  
 Install dependencies: `pip install -r requirements-client.txt`

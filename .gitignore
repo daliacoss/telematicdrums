@@ -3,3 +3,4 @@ venv/
 ignore/
 .env
 *.p
+*.sublime-*

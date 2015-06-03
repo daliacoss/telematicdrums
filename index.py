@@ -1,7 +1,6 @@
 from __future__ import print_function
 from flask import Flask, render_template, request, redirect, abort, url_for
 from flask_restful import Api, Resource, reqparse
-# from flask.ext.socketio import SocketIO
 from flask.ext.sqlalchemy import SQLAlchemy
 import time, datetime, os, random, string
 
@@ -10,7 +9,6 @@ api = Api(app)
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("DATABASE_URL")
 
 db = SQLAlchemy(app)
-# socketIO = SocketIO(app)
 
 LEN_SEQUENCE = 8
 NUM_CHANNELS = 4
@@ -201,12 +199,6 @@ def player(session_key):
 		db.session.commit()
 
 	return render_template('index.html', session_key=session_key, sequence=sequence, tempo=sequenceObject.tempo)
-
-# @socketIO.on('my event')
-# def handle_source(json_data):
-#     text = json_data["message"]#['message'].encode('ascii', 'ignore')
-#     socketIO.emit('echo', {'echo': 'Server Says: '+text+'!'}, True)
-#     print text
 
 if __name__ == "__main__":
     app.run(debug=True)
